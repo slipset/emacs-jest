@@ -69,14 +69,15 @@
 ;; 2-2: ... and closing braket
 ;;        remove from stack and add list do delete with opening braket index.
 ;;              If the last inserted in list is collapsed with current one, remove last one and add.
-(defun jest--remove-folded-range (text) 
+(defun jest--remove-folded-range (text)
   (let ((stack '())
         (list-to-del '())
         (edited text))
     (dotimes (i (length text))
-      (let ((ch (c-int-to-char (aref text i))))
+      (let ((ch (c-int-to-char (aref text i)))
+            (prev-ch (if (> i 0) (c-int-to-char (aref text (- i 1))) nil)))
         (cond
-         ((jest--check-char-quote ch)
+          ((jest--check-char-quote ch)
           (if (jest--is-in-quotes stack)
               (when (char-equal (car (car stack)) ch)
                 (setq stack (cdr stack)))
@@ -85,6 +86,8 @@
           (when (not (jest--is-in-quotes stack))
             (push (list ch i) stack)))
          ((and (jest--check-close-bracket ch)
+               (not (and (char-equal ch ?>) (char-equal prev-ch ?=)))
+               stack
                (jest--check-bracket-pair (car (car stack)) ch))
           (when (not (jest--is-in-quotes stack))
             (setq list-to-del
