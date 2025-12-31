@@ -78,7 +78,7 @@
             (prev-ch (if (> i 0) (c-int-to-char (aref text (- i 1))) nil)))
         (cond
           ((jest--check-char-quote ch)
-          (if (jest--is-in-quotes stack)
+           (if (jest--is-in-quotes stack)
               (when (char-equal (car (car stack)) ch)
                 (setq stack (cdr stack)))
             (push (list ch i) stack)))
